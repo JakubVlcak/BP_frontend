@@ -4,9 +4,9 @@ import JS from '../views/JS.vue'
 import LoginPageView from '@/views/LoginPageView.vue'
 import RegisterPageView from '@/views/RegisterPageView.vue'
 const routes = [
+  { path: '/', name: 'loginpage', component: LoginPageView },
   { path: '/home', name: 'HOME', component: HomeView },
   { path: '/JS', name: 'JS', component: JS },
-  { path: '/', name: 'loginpage', component: LoginPageView },
   {
     path: '/registerpageview',
     name: 'registerpage',
