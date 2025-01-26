@@ -34,7 +34,7 @@
                                 <div class="flex items-center h-5">
                                     <input id="remember" aria-describedby="remember" type="checkbox"
                                         class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800"
-                                        required="">
+                                        v-model="rememberMe">
                                 </div>
                                 <div class="ml-3 text-sm">
                                     <label for="remember" class="text-gray-500 dark:text-gray-300">Remember me</label>
@@ -57,8 +57,9 @@
                             </RouterLink>
                         </div>
                         <p class="text-sm font-light text-gray-500 dark:text-gray-400">
-                            Don’t have an account yet? <a href="#"
-                                class="font-medium text-primary-600 hover:underline dark:text-primary-500">Sign up</a>
+                            Don’t have an account yet? <RouterLink to="/registerpageview"><a href="#"
+                                    class="font-medium text-primary-600 hover:underline dark:text-primary-500">Sign
+                                    up</a></RouterLink>
                         </p>
                         <p v-if="error" class="error-message">{{ error }}</p>
                         <p v-if="success" class="success-message">Login successful!</p>
@@ -69,7 +70,6 @@
     </section>
 </template>
 
-
 <script>
 import { API_URL } from "@/const";
 import axios from "axios"
@@ -79,10 +79,11 @@ export default {
         return {
             username: "",
             password: "",
+            rememberMe: false, // Track the "Remember Me" checkbox state
             error: null,
             success: false,
             apiUrl: API_URL,
-        }
+        };
     },
     methods: {
         async handleLogin() {
@@ -90,39 +91,58 @@ export default {
             this.success = false;
 
             try {
-                await axios.post(this.apiUrl + "/login/", {
+                const response = await axios.post(this.apiUrl + "/login/", {
                     username: this.username,
                     password: this.password,
                 }, {
                     withCredentials: true,
+                });
+
+                const token = response.data.token;
+                const username = response.data.username;
+                localStorage.setItem("authToken", token);
+                localStorage.setItem("username", username)
+
+                // Save credentials if "Remember Me" is checked
+                if (this.rememberMe) {
+                    localStorage.setItem("rememberedUsername", this.username);
+                    localStorage.setItem("rememberedPassword", this.password);
+                } else {
+                    // Clear saved credentials if "Remember Me" is unchecked
+                    localStorage.removeItem("rememberedUsername");
+                    localStorage.removeItem("rememberedPassword");
                 }
-                ).then(response => {
 
-                    const token = response.data.token;
-
-
-                    localStorage.setItem("authToken", token);
-                    console.log("Token stored in localStorage:", token);
-
-
-                    this.$router.push("/home");
-                })
-                    .catch(error => {
-                        console.error("Login error:", error);
-                    });
-
+                this.success = true;
+                this.$router.push("/home");
             } catch (error) {
-
-                this.error =
-                    error.response?.data?.message || "Failed to login. Please try again.";
+                this.error = error.response?.data?.message || "Failed to login. Please try again.";
                 console.error("Login error:", error);
             }
         },
     },
     beforeMount() {
+        // Check if credentials are saved in localStorage
+        const rememberedUsername = localStorage.getItem("rememberedUsername");
+        const rememberedPassword = localStorage.getItem("rememberedPassword");
 
+        if (rememberedUsername && rememberedPassword) {
+            this.username = rememberedUsername;
+            this.password = rememberedPassword;
+            this.rememberMe = true; // Check the "Remember Me" checkbox
+        }
     },
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.error-message {
+    color: red;
+    margin-top: 10px;
+}
+
+.success-message {
+    color: green;
+    margin-top: 10px;
+}
+</style>

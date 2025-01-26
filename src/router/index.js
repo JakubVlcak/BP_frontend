@@ -1,11 +1,12 @@
 import { createWebHistory, createRouter } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
 import JS from '../views/JS.vue'
 import LoginPageView from '@/views/LoginPageView.vue'
 import RegisterPageView from '@/views/RegisterPageView.vue'
+import DashboardView from '../views/DashboardView.vue'
 const routes = [
   { path: '/', name: 'loginpage', component: LoginPageView },
-  { path: '/home', name: 'HOME', component: HomeView },
+  { path: '/loginpageview', name: 'LoginPageView', component: LoginPageView },
+  { path: '/home', name: 'HOME', component: DashboardView },
   { path: '/JS', name: 'JS', component: JS },
   {
     path: '/registerpageview',
