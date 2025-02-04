@@ -6,7 +6,9 @@
 
         <div v-if="activities.length > 0" class="w-full max-w-md bg-white shadow rounded p-4">
             <ul>
-                <li v-for="activity in activities" :key="activity.id" class="border-b last:border-none py-2">
+                <li v-for="activity in activities" :key="activity.ActivityID"
+                    class="border-b last:border-none py-2 cursor-pointer hover:bg-gray-100"
+                    @click="viewActivity(activity.ActivityID)">
                     <p><strong>Time Created:</strong> {{ formatDate(activity.timeCreated) }}</p>
                 </li>
             </ul>
@@ -19,7 +21,7 @@
 </template>
 
 <script>
-import axiosInstance from "@/services/AxiosInstance";
+import axiosInstance from "@/services/axiosInstance";
 
 export default {
     name: "ActivitiesList",
@@ -45,8 +47,11 @@ export default {
             const hours = date.getHours();
             const minutes = date.getMinutes();
 
-
             return `${year} ${month}.${day} ${hours}:${minutes.toString().padStart(2, '0')}`;
+        },
+        viewActivity(activityId) {
+            console.log("Activity ID:", activityId); // Debugging: Check if the ID is correct
+            this.$router.push({ name: 'ActivityView', params: { ActivityID: activityId } });
         },
     },
     mounted() {

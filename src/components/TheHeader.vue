@@ -71,13 +71,10 @@
 </template>
 
 <script>
-import axiosInstance from '@/services/axiosInstance'; // Import your axios instance
-
 export default {
   data() {
     return {
-      users: [], // To store the fetched users
-      username: '',
+      username: '', // Initialize username
     };
   },
   methods: {
@@ -88,19 +85,9 @@ export default {
         this.username = username; // Set the username if it exists
       }
     },
-    async fetchUsers() {
-      try {
-        const response = await axiosInstance.get('/api/users/'); // Make GET request to /api/users/
-        this.users = response.data; // Store the fetched users in the data property
-        console.log('Users fetched successfully:', this.users);
-      } catch (error) {
-        console.error('Error fetching users:', error);
-      }
-    },
   },
   mounted() {
-    this.fetchUsers(); // Fetch users when the component is mounted
-    this.fetchUsername();
+    this.fetchUsername(); // Fetch username when the component is mounted
   },
 };
 </script>
