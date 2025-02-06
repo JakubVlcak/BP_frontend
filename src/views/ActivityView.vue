@@ -18,8 +18,8 @@
                         <p class="text-sm text-gray-600">Distance</p>
                     </div>
                     <div class="text-center">
-                        <p class="text-2xl font-bold">{{ metrics.movingTime }}</p>
-                        <p class="text-sm text-gray-600">Moving Time</p>
+                        <p class="text-2xl font-bold">{{ metrics.elapsedTime }}</p>
+                        <p class="text-sm text-gray-600">Elapsed Time</p>
                     </div>
                     <div class="text-center">
                         <p class="text-2xl font-bold">{{ metrics.elevation }} m</p>
@@ -34,8 +34,6 @@
                         <p class="text-sm text-gray-600">Total Work</p>
                     </div>
                 </div>
-
-                <!-- Display Cadence Data -->
                 <div v-if="records && records.length > 0">
                     <h3 class="text-md font-semibold mt-4 mb-2">Cadence Records</h3>
                     <LineChart :data="records" :yKey="'cadence'" :lineColor="'steelblue'" />
@@ -43,8 +41,6 @@
                 <div v-else>
                     <p>No cadence data available.</p>
                 </div>
-
-                <!-- Display Power Data -->
                 <div v-if="records && records.length > 0">
                     <h3 class="text-md font-semibold mt-4 mb-2">Power Records</h3>
                     <LineChart :data="records" :yKey="'power'" :lineColor="'orange'" />
@@ -52,8 +48,6 @@
                 <div v-else>
                     <p>No power data available.</p>
                 </div>
-
-                <!-- Display Heart Rate Data -->
                 <div v-if="records && records.length > 0">
                     <h3 class="text-md font-semibold mt-4 mb-2">Heart Rate Records</h3>
                     <LineChart :data="records" :yKey="'heartRate'" :lineColor="'red'" />
@@ -61,8 +55,6 @@
                 <div v-else>
                     <p>No heart rate data available.</p>
                 </div>
-
-                <!-- Display Altitude Data -->
                 <div v-if="records && records.length > 0">
                     <h3 class="text-md font-semibold mt-4 mb-2">Altitude Records</h3>
                     <LineChart :data="records" :yKey="'altitude'" :lineColor="'green'" />
@@ -70,14 +62,19 @@
                 <div v-else>
                     <p>No altitude data available.</p>
                 </div>
-
-                <!-- Display Temperature Data -->
                 <div v-if="records && records.length > 0">
                     <h3 class="text-md font-semibold mt-4 mb-2">Temperature Records</h3>
                     <LineChart :data="records" :yKey="'temperature'" :lineColor="'purple'" />
                 </div>
                 <div v-else>
                     <p>No temperature data available.</p>
+                </div>
+                <div v-if="records && records.length > 0">
+                    <h3 class="text-md font-semibold mt-4 mb-2">Speed Records</h3>
+                    <LineChart :data="speedData" :yKey="'speed'" :lineColor="'purple'" />
+                </div>
+                <div v-else>
+                    <p>No speed data available.</p>
                 </div>
             </div>
 
@@ -102,77 +99,96 @@
 <script>
 import axiosInstance from "@/services/axiosInstance";
 import TheHeader from '@/components/TheHeader.vue';
-import LineChart from '@/components/LineChart.vue'; // Import the LineChart component
+import LineChart from '@/components/LineChart.vue';
 
 export default {
     components: {
         TheHeader,
-        LineChart, // Register the LineChart component
+        LineChart,
     },
     data() {
         return {
-            activity: null, // Store the fetched activity details
-            records: [], // Store the fetched records
-            metrics: null, // Store calculated metrics
-            loading: true, // Track loading state
-            error: null, // Track error state
+            activity: null,
+            records: [],
+            metrics: null,
+            loading: true,
+            error: null,
         };
+    },
+    computed: {
+        speedData() {
+            return this.records
+                .filter(record => record.speed > 0) // Filter out records with 0 speed
+                .map(record => ({
+                    ...record,
+                    speed: (record.speed * 3.6).toFixed(2) // Convert m/s to km/h
+                }));
+        }
     },
     methods: {
         async fetchActivity() {
             try {
-                const activityId = this.$route.params.ActivityID; // Get ActivityID from route params
+                const activityId = this.$route.params.ActivityID;
                 const response = await axiosInstance.get(`/api/activities/${activityId}/`);
                 const response2 = await axiosInstance.get(`/api/activities/${activityId}/records/`);
 
-                console.log("Activity Response:", response.data); // Log activity response
-                console.log("Records Response:", response2.data); // Log records response
+                console.log("Activity Response:", response.data);
+                console.log("Records Response:", response2.data);
 
                 this.activity = response.data;
-                this.records = response2.data; // Store the fetched records
+                this.records = response2.data;
 
-                // Calculate metrics
+
+
                 this.calculateMetrics(response2.data);
             } catch (error) {
                 console.error("Error fetching activity details:", error);
                 this.error = "Failed to load activity details. Please try again later.";
             } finally {
-                this.loading = false; // Set loading to false after the request completes
+                this.loading = false;
             }
         },
         calculateMetrics(records) {
             if (!records || records.length === 0) return;
 
-            // Calculate Distance (in km)
-            const distance = records[records.length - 1].distance; // Last record's distance
-            const distanceKm = (distance / 1000).toFixed(2); // Convert to km
 
-            // Calculate Moving Time (in hh:mm:ss format)
+            const distance = records[records.length - 1].distance;
+            const distanceKm = (distance / 1000).toFixed(2);
+
+
             const startTime = new Date(records[0].timestamp);
             const endTime = new Date(records[records.length - 1].timestamp);
             const movingTimeMs = endTime - startTime;
-            const movingTime = new Date(movingTimeMs).toISOString().substr(11, 8); // Format as hh:mm:ss
+            const movingTimeSeconds = movingTimeMs / 1000;
+            const elapsedTime = new Date(movingTimeMs).toISOString().substr(11, 8);
 
-            // Calculate Elevation (in meters)
-            const elevation = records.reduce((acc, record) => {
-                const altitude = parseFloat(record.altitude);
-                return acc + (isNaN(altitude) ? 0 : altitude); // Handle non-numeric altitude values
-            }, 0);
 
-            // Calculate Weighted Average Power (in watts)
+            // Ascended elevation
+            let ascendedElevation = 0;
+            for (let i = 1; i < records.length; i++) {
+                const prevAltitude = parseFloat(records[i - 1].altitude);
+                const currentAltitude = parseFloat(records[i].altitude);
+
+                if (!isNaN(prevAltitude) && !isNaN(currentAltitude) && currentAltitude > prevAltitude) {
+                    ascendedElevation += currentAltitude - prevAltitude;
+                }
+            }
+
+
             const totalPower = records.reduce((acc, record) => {
                 const power = parseFloat(record.power);
-                return acc + (isNaN(power) ? 0 : power); // Handle non-numeric power values
+                return acc + (isNaN(power) ? 0 : power);
             }, 0);
             const avgPower = (totalPower / records.length).toFixed(0);
 
-            // Calculate Total Work (in kJ)
-            const totalWork = (totalPower * (movingTimeMs / 1000) / 1000).toFixed(0); // Work = Power * Time
+
+            //const totalWork = (totalPower * (movingTimeMs / 1000) / 1000).toFixed(0);
+            const totalWork = (avgPower * movingTimeSeconds / 1000).toFixed(0);
 
             this.metrics = {
                 distance: distanceKm,
-                movingTime,
-                elevation: elevation.toFixed(0), // Now elevation is guaranteed to be a number
+                elapsedTime,
+                elevation: ascendedElevation.toFixed(0),
                 avgPower,
                 totalWork,
             };
@@ -189,11 +205,9 @@ export default {
         },
     },
     mounted() {
-        this.fetchActivity(); // Fetch activity details when the component is mounted
+        this.fetchActivity();
     },
 };
 </script>
 
-<style scoped>
-/* Add any custom styles here */
-</style>
+<style scoped></style>
