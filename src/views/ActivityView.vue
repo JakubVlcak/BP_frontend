@@ -34,47 +34,63 @@
                         <p class="text-sm text-gray-600">Total Work</p>
                     </div>
                 </div>
-                <div v-if="records && records.length > 0">
-                    <h3 class="text-md font-semibold mt-4 mb-2">Cadence Records</h3>
-                    <LineChart :data="records" :yKey="'cadence'" :lineColor="'steelblue'" />
+
+                <!-- Display Toggle Buttons -->
+                <div class="mb-4">
+                    <button @click="toggleChart('cadence')" class="px-4 py-2 bg-blue-500 text-white rounded">Toggle
+                        Cadence</button>
+                    <button @click="toggleChart('power')" class="px-4 py-2 bg-orange-500 text-white rounded">Toggle
+                        Power</button>
+                    <button @click="toggleChart('heartRate')" class="px-4 py-2 bg-red-500 text-white rounded">Toggle
+                        Heart Rate</button>
+                    <button @click="toggleChart('altitude')" class="px-4 py-2 bg-green-500 text-white rounded">Toggle
+                        Altitude</button>
+                    <button @click="toggleChart('temperature')"
+                        class="px-4 py-2 bg-purple-500 text-white rounded">Toggle Temperature</button>
+                    <button @click="toggleChart('speed')" class="px-4 py-2 bg-pink-500 text-white rounded">Toggle
+                        Speed</button>
+                </div>
+
+                <!-- Display Charts -->
+                <div v-if="records && records.length > 0" class="relative h-96">
+                    <!-- Cadence Records -->
+                    <div v-if="showCadence" class="absolute inset-0 z-10">
+                        <h3 class="text-md font-semibold mb-2">Cadence Records</h3>
+                        <LineChart :data="records" :yKey="'cadence'" :lineColor="'steelblue'" />
+                    </div>
+
+                    <!-- Power -->
+                    <div v-if="showPower" class="absolute inset-0 z-20">
+                        <h3 class="text-md font-semibold mb-2">Power</h3>
+                        <LineChart :data="records" :yKey="'power'" :lineColor="'orange'" />
+                    </div>
+
+                    <!-- Heart Rate -->
+                    <div v-if="showHeartRate" class="absolute inset-0 z-30">
+                        <h3 class="text-md font-semibold mb-2">Heart Rate</h3>
+                        <LineChart :data="records" :yKey="'heartRate'" :lineColor="'red'" />
+                    </div>
+
+                    <!-- Altitude -->
+                    <div v-if="showAltitude" class="absolute inset-0 z-40">
+                        <h3 class="text-md font-semibold mb-2">Altitude</h3>
+                        <LineChart :data="records" :yKey="'altitude'" :lineColor="'green'" />
+                    </div>
+
+                    <!-- Temperature -->
+                    <div v-if="showTemperature" class="absolute inset-0 z-50">
+                        <h3 class="text-md font-semibold mb-2">Temperature</h3>
+                        <LineChart :data="records" :yKey="'temperature'" :lineColor="'purple'" />
+                    </div>
+
+                    <!-- Speed -->
+                    <div v-if="showSpeed" class="absolute inset-0 z-60">
+                        <h3 class="text-md font-semibold mb-2">Speed</h3>
+                        <LineChart :data="speedData" :yKey="'speed'" :lineColor="'purple'" />
+                    </div>
                 </div>
                 <div v-else>
-                    <p>No cadence data available.</p>
-                </div>
-                <div v-if="records && records.length > 0">
-                    <h3 class="text-md font-semibold mt-4 mb-2">Power Records</h3>
-                    <LineChart :data="records" :yKey="'power'" :lineColor="'orange'" />
-                </div>
-                <div v-else>
-                    <p>No power data available.</p>
-                </div>
-                <div v-if="records && records.length > 0">
-                    <h3 class="text-md font-semibold mt-4 mb-2">Heart Rate Records</h3>
-                    <LineChart :data="records" :yKey="'heartRate'" :lineColor="'red'" />
-                </div>
-                <div v-else>
-                    <p>No heart rate data available.</p>
-                </div>
-                <div v-if="records && records.length > 0">
-                    <h3 class="text-md font-semibold mt-4 mb-2">Altitude Records</h3>
-                    <LineChart :data="records" :yKey="'altitude'" :lineColor="'green'" />
-                </div>
-                <div v-else>
-                    <p>No altitude data available.</p>
-                </div>
-                <div v-if="records && records.length > 0">
-                    <h3 class="text-md font-semibold mt-4 mb-2">Temperature Records</h3>
-                    <LineChart :data="records" :yKey="'temperature'" :lineColor="'purple'" />
-                </div>
-                <div v-else>
-                    <p>No temperature data available.</p>
-                </div>
-                <div v-if="records && records.length > 0">
-                    <h3 class="text-md font-semibold mt-4 mb-2">Speed Records</h3>
-                    <LineChart :data="speedData" :yKey="'speed'" :lineColor="'purple'" />
-                </div>
-                <div v-else>
-                    <p>No speed data available.</p>
+                    <p>No data available.</p>
                 </div>
             </div>
 
@@ -113,6 +129,12 @@ export default {
             metrics: null,
             loading: true,
             error: null,
+            showCadence: true,
+            showPower: true,
+            showHeartRate: true,
+            showAltitude: true,
+            showTemperature: true,
+            showSpeed: true,
         };
     },
     computed: {
@@ -138,8 +160,6 @@ export default {
                 this.activity = response.data;
                 this.records = response2.data;
 
-
-
                 this.calculateMetrics(response2.data);
             } catch (error) {
                 console.error("Error fetching activity details:", error);
@@ -148,20 +168,20 @@ export default {
                 this.loading = false;
             }
         },
+        toggleChart(chart) {
+            this[`show${chart.charAt(0).toUpperCase() + chart.slice(1)}`] = !this[`show${chart.charAt(0).toUpperCase() + chart.slice(1)}`];
+        },
         calculateMetrics(records) {
             if (!records || records.length === 0) return;
 
-
             const distance = records[records.length - 1].distance;
             const distanceKm = (distance / 1000).toFixed(2);
-
 
             const startTime = new Date(records[0].timestamp);
             const endTime = new Date(records[records.length - 1].timestamp);
             const movingTimeMs = endTime - startTime;
             const movingTimeSeconds = movingTimeMs / 1000;
             const elapsedTime = new Date(movingTimeMs).toISOString().substr(11, 8);
-
 
             // Ascended elevation
             let ascendedElevation = 0;
@@ -174,15 +194,12 @@ export default {
                 }
             }
 
-
             const totalPower = records.reduce((acc, record) => {
                 const power = parseFloat(record.power);
                 return acc + (isNaN(power) ? 0 : power);
             }, 0);
             const avgPower = (totalPower / records.length).toFixed(0);
 
-
-            //const totalWork = (totalPower * (movingTimeMs / 1000) / 1000).toFixed(0);
             const totalWork = (avgPower * movingTimeSeconds / 1000).toFixed(0);
 
             this.metrics = {
