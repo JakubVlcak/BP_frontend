@@ -54,37 +54,37 @@
                 <!-- Display Charts -->
                 <div v-if="records && records.length > 0" class="relative h-96">
                     <!-- Cadence Records -->
-                    <div v-if="showCadence" class="absolute inset-0 z-10">
+                    <div v-if="showCadence">
                         <h3 class="text-md font-semibold mb-2">Cadence Records</h3>
                         <LineChart :data="records" :yKey="'cadence'" :lineColor="'steelblue'" />
                     </div>
 
                     <!-- Power -->
-                    <div v-if="showPower" class="absolute inset-0 z-20">
+                    <div v-if="showPower">
                         <h3 class="text-md font-semibold mb-2">Power</h3>
                         <LineChart :data="records" :yKey="'power'" :lineColor="'orange'" />
                     </div>
 
                     <!-- Heart Rate -->
-                    <div v-if="showHeartRate" class="absolute inset-0 z-30">
+                    <div v-if="showHeartRate">
                         <h3 class="text-md font-semibold mb-2">Heart Rate</h3>
                         <LineChart :data="records" :yKey="'heartRate'" :lineColor="'red'" />
                     </div>
 
                     <!-- Altitude -->
-                    <div v-if="showAltitude" class="absolute inset-0 z-40">
+                    <div v-if="showAltitude">
                         <h3 class="text-md font-semibold mb-2">Altitude</h3>
                         <LineChart :data="records" :yKey="'altitude'" :lineColor="'green'" />
                     </div>
 
                     <!-- Temperature -->
-                    <div v-if="showTemperature" class="absolute inset-0 z-50">
+                    <div v-if="showTemperature">
                         <h3 class="text-md font-semibold mb-2">Temperature</h3>
                         <LineChart :data="records" :yKey="'temperature'" :lineColor="'purple'" />
                     </div>
 
                     <!-- Speed -->
-                    <div v-if="showSpeed" class="absolute inset-0 z-60">
+                    <div v-if="showSpeed">
                         <h3 class="text-md font-semibold mb-2">Speed</h3>
                         <LineChart :data="speedData" :yKey="'speed'" :lineColor="'purple'" />
                     </div>
