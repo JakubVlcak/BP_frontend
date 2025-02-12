@@ -9,9 +9,3 @@ app.use(createPinia()) // Add Pinia store plugin
 app.use(router) // (Optional) Add Vue Router plugin
 
 app.mount('#app') // Mount the app to an element with id 'app'
-
-// eventBus.js
-import { reactive } from 'vue'
-export const eventBus = reactive({
-  sharedTooltipData: null,
-})

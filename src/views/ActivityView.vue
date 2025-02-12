@@ -5,7 +5,10 @@
             <header>
                 <h2 class="text-lg font-bold mb-4">Activity Details</h2>
             </header>
-
+            <div v-if="records.length > 0" class="w-full max-w-2xl my-6">
+                <h3 class="text-md font-semibold mb-2">Activity Route</h3>
+                <MapChart :data="records" :latKey="'position_lat'" :longKey="'position_long'" />
+            </div>
             <!-- Display Activity ID -->
             <div v-if="activity" class="w-full max-w-full bg-white shadow rounded p-4">
                 <p><strong>Activity ID:</strong> {{ activity.ActivityID }}</p>
@@ -37,56 +40,50 @@
 
                 <!-- Display Toggle Buttons -->
                 <div class="mb-4">
-                    <button @click="toggleChart('cadence')" class="px-4 py-2 bg-blue-500 text-white rounded">Toggle
-                        Cadence</button>
-                    <button @click="toggleChart('power')" class="px-4 py-2 bg-orange-500 text-white rounded">Toggle
+                    <button @click="toggleChart('altitude')" class="px-4 py-2 bg-green-500 text-white rounded">Toggle
+                        Altitude</button>
+                    <button @click="toggleChart('speed')" class="px-4 py-2 bg-blue-500 text-white rounded">Toggle
+                        Speed</button>
+                    <button @click="toggleChart('power')" class="px-4 py-2 bg-purple-500 text-white rounded">Toggle
                         Power</button>
                     <button @click="toggleChart('heartRate')" class="px-4 py-2 bg-red-500 text-white rounded">Toggle
                         Heart Rate</button>
-                    <button @click="toggleChart('altitude')" class="px-4 py-2 bg-green-500 text-white rounded">Toggle
-                        Altitude</button>
-                    <button @click="toggleChart('temperature')"
-                        class="px-4 py-2 bg-purple-500 text-white rounded">Toggle Temperature</button>
-                    <button @click="toggleChart('speed')" class="px-4 py-2 bg-pink-500 text-white rounded">Toggle
-                        Speed</button>
+                    <button @click="toggleChart('cadence')" class="px-4 py-2 bg-orange-500 text-white rounded">Toggle
+                        Cadence</button>
+                    <button @click="toggleChart('temperature')" class="px-4 py-2 bg-pink-500 text-white rounded">Toggle
+                        Temperature</button>
                 </div>
 
                 <!-- Display Charts -->
                 <div v-if="records && records.length > 0" class="relative h-96">
-                    <!-- Cadence Records -->
-                    <div v-if="showCadence">
-                        <h3 class="text-md font-semibold mb-2">Cadence Records</h3>
-                        <LineChart :data="records" :yKey="'cadence'" :lineColor="'steelblue'" />
-                    </div>
-
-                    <!-- Power -->
-                    <div v-if="showPower">
-                        <h3 class="text-md font-semibold mb-2">Power</h3>
-                        <LineChart :data="records" :yKey="'power'" :lineColor="'orange'" />
-                    </div>
-
-                    <!-- Heart Rate -->
-                    <div v-if="showHeartRate">
-                        <h3 class="text-md font-semibold mb-2">Heart Rate</h3>
-                        <LineChart :data="records" :yKey="'heartRate'" :lineColor="'red'" />
-                    </div>
-
                     <!-- Altitude -->
                     <div v-if="showAltitude">
                         <h3 class="text-md font-semibold mb-2">Altitude</h3>
                         <LineChart :data="records" :yKey="'altitude'" :lineColor="'green'" />
                     </div>
-
-                    <!-- Temperature -->
-                    <div v-if="showTemperature">
-                        <h3 class="text-md font-semibold mb-2">Temperature</h3>
-                        <LineChart :data="records" :yKey="'temperature'" :lineColor="'purple'" />
-                    </div>
-
                     <!-- Speed -->
                     <div v-if="showSpeed">
                         <h3 class="text-md font-semibold mb-2">Speed</h3>
-                        <LineChart :data="speedData" :yKey="'speed'" :lineColor="'purple'" />
+                        <LineChart :data="speedData" :yKey="'speed'" :lineColor="'blue'" />
+                    </div>
+                    <!-- Power -->
+                    <div v-if="showPower">
+                        <h3 class="text-md font-semibold mb-2">Power</h3>
+                        <LineChart :data="records" :yKey="'power'" :lineColor="'purple'" />
+                    </div>
+                    <!-- Heart Rate -->
+                    <div v-if="showHeartRate">
+                        <h3 class="text-md font-semibold mb-2">Heart Rate</h3>
+                        <LineChart :data="records" :yKey="'heartRate'" :lineColor="'red'" />
+                    </div>
+                    <div v-if="showCadence">
+                        <h3 class="text-md font-semibold mb-2">Cadence Records</h3>
+                        <LineChart :data="records" :yKey="'cadence'" :lineColor="'orange'" />
+                    </div>
+                    <!-- Temperature -->
+                    <div v-if="showTemperature">
+                        <h3 class="text-md font-semibold mb-2">Temperature</h3>
+                        <LineChart :data="records" :yKey="'temperature'" :lineColor="'pink'" />
                     </div>
                 </div>
                 <div v-else>
@@ -116,11 +113,13 @@
 import axiosInstance from "@/services/axiosInstance";
 import TheHeader from '@/components/TheHeader.vue';
 import LineChart from '@/components/LineChart.vue';
+import MapChart from "@/components/MapChart.vue";
 
 export default {
     components: {
         TheHeader,
         LineChart,
+        MapChart
     },
     data() {
         return {

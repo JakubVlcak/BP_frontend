@@ -75,7 +75,10 @@ export default {
 
             svg.append('g')
                 .attr('transform', `translate(0,${height})`)
-                .call(d3.axisBottom(x));
+                .call(d3.axisBottom(x)
+                    .ticks(d3.timeMinute.every(10))
+                    .tickFormat(d3.timeFormat('%I:%M %p'))
+                );
 
             svg.append('g').call(d3.axisLeft(y));
 
@@ -115,7 +118,8 @@ export default {
                 .style('border-radius', '4px')
                 .style('font-size', '12px')
                 .style('pointer-events', 'none')
-                .style('display', 'none');
+                .style('display', 'none')
+
 
             const circle = svg.append('circle')
                 .attr('r', 0)
@@ -161,12 +165,13 @@ export default {
             if (!d) return;
 
             const yPos = this.yScale(d.value);
+            const formattedTime = d3.timeFormat('%I:%M:%S %p')(d.timestamp); // Format time
 
             d3.select(this.$refs.chartContainer).select('.tooltip')
                 .style('display', 'block')
-                .style('left', `${xPos + 10}px`)
-                .html(`<strong>N</strong> ${d.value}`);
-
+                .style('left', `${xPos + 0}px`)
+                .style('margin', '-100px')
+                .html(`<strong>N</strong> ${d.value} <br/><strong>Time:</strong> ${formattedTime}`);
 
             d3.select(this.$refs.chart).select('circle')
                 .attr('cx', this.xScale(d.timestamp))
@@ -182,7 +187,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .w-full {
     width: 100%;
 }
@@ -193,7 +198,6 @@ export default {
     background: rgba(0, 0, 0, 0.8);
     color: white;
     border-radius: 4px;
-    font-size: 12px;
     pointer-events: none;
 }
 </style>
