@@ -62,6 +62,7 @@ export default {
 
             try {
                 const token = localStorage.getItem('authToken');
+                console.log('Using Token:', token); // Log the token being sent
 
                 if (!token) {
                     this.message = 'Authentication token is missing.';

@@ -114,6 +114,7 @@ import axiosInstance from "@/services/axiosInstance";
 import TheHeader from '@/components/TheHeader.vue';
 import LineChart from '@/components/LineChart.vue';
 import MapChart from "@/components/MapChart.vue";
+import { useMetricsStore } from '@/stores/MetricsStore.js';
 
 export default {
     components: {
@@ -158,8 +159,10 @@ export default {
 
                 this.activity = response.data;
                 this.records = response2.data;
+                const metricsStore = useMetricsStore();
+                this.metrics = metricsStore.getMetrics(activityId);  // Set metrics to the component data
 
-                this.calculateMetrics(response2.data);
+                this.calculateMetrics(response2.data, activityId);
             } catch (error) {
                 console.error("Error fetching activity details:", error);
                 this.error = "Failed to load activity details. Please try again later.";
@@ -170,7 +173,7 @@ export default {
         toggleChart(chart) {
             this[`show${chart.charAt(0).toUpperCase() + chart.slice(1)}`] = !this[`show${chart.charAt(0).toUpperCase() + chart.slice(1)}`];
         },
-        calculateMetrics(records) {
+        calculateMetrics(records, activityId) {
             if (!records || records.length === 0) return;
 
             const distance = records[records.length - 1].distance;
@@ -201,13 +204,17 @@ export default {
 
             const totalWork = (avgPower * movingTimeSeconds / 1000).toFixed(0);
 
-            this.metrics = {
+            // Store the metrics in Pinia
+            const metrics = {
                 distance: distanceKm,
                 elapsedTime,
                 elevation: ascendedElevation.toFixed(0),
                 avgPower,
                 totalWork,
             };
+
+            const metricsStore = useMetricsStore();
+            metricsStore.setMetrics(activityId, metrics);
         },
         formatDate(timestamp) {
             const date = new Date(timestamp);
@@ -225,5 +232,6 @@ export default {
     },
 };
 </script>
+
 
 <style scoped></style>

@@ -1,6 +1,6 @@
 <template>
     <TheHeader />
-    <div class="max-w-3xl mx-auto p-6 space-y-6">
+    <div class="max-w-3xl mx-auto p-10 space-y-6">
         <FitFileUpload />
         <ListActivities />
     </div>

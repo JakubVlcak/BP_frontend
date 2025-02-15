@@ -10,6 +10,9 @@
                     class="border-b last:border-none py-2 cursor-pointer hover:bg-gray-100"
                     @click="viewActivity(activity.ActivityID)">
                     <p><strong>Time Created:</strong> {{ formatDate(activity.timeCreated) }}</p>
+                    <!-- Displaying metrics from Pinia store -->
+                    <p><strong>Distance:</strong> {{ getMetrics(activity.ActivityID).distance }} km</p>
+                    <p><strong>Elapsed Time:</strong> {{ getMetrics(activity.ActivityID).elapsedTime }}</p>
                 </li>
             </ul>
         </div>
@@ -22,6 +25,7 @@
 
 <script>
 import axiosInstance from "@/services/axiosInstance";
+import { useMetricsStore } from '@/stores/MetricsStore.js';
 
 export default {
     name: "ActivitiesList",
@@ -53,10 +57,17 @@ export default {
             console.log("Activity ID:", activityId); // Debugging: Check if the ID is correct
             this.$router.push({ name: 'ActivityView', params: { ActivityID: activityId } });
         },
+        // Access metrics from the store
+        getMetrics(activityId) {
+            const metricsStore = useMetricsStore();
+            return metricsStore.getMetrics(activityId) || {}; // Return an empty object if no metrics
+        },
     },
+
     mounted() {
         this.fetchActivities();
     },
+
 };
 </script>
 
