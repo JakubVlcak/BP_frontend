@@ -1,9 +1,10 @@
 <template>
-  <div ref="mapContainer" class="w-full h-96 bg-gray-100 shadow rounded relative">
-  </div>
+  <div ref="mapContainer" class="w-full h-96 bg-gray-100 shadow rounded relative"></div>
 </template>
 
 <script>
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 import * as d3 from "d3";
 
 export default {
@@ -13,79 +14,94 @@ export default {
     longKey: String,
   },
   mounted() {
-    this.drawMap();
+    this.initMap();
   },
   watch: {
     data() {
-      this.drawMap();
+      this.drawData();
     },
   },
   methods: {
-    drawMap() {
+    convertSemicirclesToDegrees(semicircles) {
+      return semicircles * (180 / 2147483648);
+    },
+    initMap() {
       if (!this.data || this.data.length === 0) return;
 
-      // Convert fixed-point lat/long to proper format
-      const coordinates = this.data.map((d) => [
-        d[this.longKey] / 1e7, // Longitude
-        d[this.latKey] / 1e7,  // Latitude
-      ]);
+      const firstPoint = [
+        this.convertSemicirclesToDegrees(this.data[0][this.latKey]),
+        this.convertSemicirclesToDegrees(this.data[0][this.longKey])
+      ];
 
-      // Set dimensions
-      const width = this.$refs.mapContainer.clientWidth;
-      const height = this.$refs.mapContainer.clientHeight;
+      const lastPoint = [
+        this.convertSemicirclesToDegrees(this.data[this.data.length - 1][this.latKey]),
+        this.convertSemicirclesToDegrees(this.data[this.data.length - 1][this.longKey])
+      ];
 
-      // Clear previous SVG
-      d3.select(this.$refs.mapContainer).selectAll("*").remove();
+      this.map = L.map(this.$refs.mapContainer).setView(firstPoint, 11);
 
-      // Create SVG
-      const svg = d3
-        .select(this.$refs.mapContainer)
-        .append("svg")
-        .attr("width", width)
-        .attr("height", height)
-        .call(
-          d3.zoom()
-            .scaleExtent([1, 10]) // Zoom limits
-            .on("zoom", (event) => {
-              mapGroup.attr("transform", event.transform);
-            })
-        );
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(this.map);
 
-      // Create projection (scales lat/lng to fit SVG)
-      const projection = d3.geoMercator().fitSize([width, height], {
-        type: "LineString",
-        coordinates: coordinates,
+      this.svgLayer = L.svg().addTo(this.map);
+      this.svg = d3.select(this.svgLayer._rootGroup);
+
+      this.map.on("zoomend", this.drawData);
+      this.map.on("moveend", this.drawData);
+
+      // Custom icons
+      const startIcon = L.divIcon({
+        className: "custom-icon",
+        html: "<div style='background:green;width:20px;height:20px;border-radius:50%;'></div>",
       });
 
-      // Create path generator
-      const pathGenerator = d3.line()
-        .x((d) => projection(d)[0])
-        .y((d) => projection(d)[1]);
+      const endIcon = L.divIcon({
+        className: "custom-icon",
+        html: "<div style='background:repeating-conic-gradient(black 0% 25%, white 25% 50%) center/10px 20px;width:20px;height:20px;border-radius:50%;'></div>",
+      });
 
-      // Create a group for map elements
-      const mapGroup = svg.append("g");
+      // Add markers
+      L.marker(firstPoint, { icon: startIcon }).addTo(this.map);
+      L.marker(lastPoint, { icon: endIcon }).addTo(this.map);
 
-      // Draw the polyline
-      mapGroup.append("path")
+      this.drawData();
+    },
+
+    drawData() {
+      if (!this.data || this.data.length === 0) return;
+
+      const coordinates = this.data.map((d) => [
+        this.convertSemicirclesToDegrees(d[this.longKey]),
+        this.convertSemicirclesToDegrees(d[this.latKey])
+      ]);
+
+      const projection = (coords) => {
+        const point = this.map.latLngToLayerPoint([coords[1], coords[0]]);
+        return [point.x, point.y];
+      };
+
+      this.svg.selectAll("*").remove();
+
+      const lineGenerator = d3.line()
+        .x(d => projection(d)[0])
+        .y(d => projection(d)[1]);
+
+      this.svg.append("path")
         .datum(coordinates)
-        .attr("d", pathGenerator)
+        .attr("d", lineGenerator)
         .attr("fill", "none")
         .attr("stroke", "blue")
         .attr("stroke-width", 2);
 
 
-      // Draw points with tooltips
-      mapGroup.selectAll("circle")
-        .data(coordinates)
-        .enter()
-        .append("circle")
-        .attr("cx", (d) => projection(d)[0])
-        .attr("cy", (d) => projection(d)[1])
-        .attr("r", 0.5)
-        .attr("fill", "red")
     },
-  },
+  }
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.custom-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+</style>

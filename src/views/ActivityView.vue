@@ -1,11 +1,14 @@
 <template>
     <div>
         <TheHeader />
+
+
+
         <section class="flex flex-col items-center justify-center min-h-screen pt-10 px-4">
             <header>
                 <h2 class="text-lg font-bold mb-4">Activity Details</h2>
             </header>
-            <div v-if="records.length > 0" class="w-full max-w-2xl my-6">
+            <div v-if="records.length > 0" class="w-full max-w-4xl my-1">
                 <h3 class="text-md font-semibold mb-2">Activity Route</h3>
                 <MapChart :data="records" :latKey="'position_lat'" :longKey="'position_long'" />
             </div>
@@ -107,6 +110,7 @@
             </div>
         </section>
     </div>
+
 </template>
 
 <script>

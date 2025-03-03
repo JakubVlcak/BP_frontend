@@ -26,7 +26,6 @@
 <script>
 import axiosInstance from "@/services/axiosInstance";
 import { useMetricsStore } from '@/stores/MetricsStore.js';
-
 export default {
     name: "ActivitiesList",
     data() {

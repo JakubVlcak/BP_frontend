@@ -12,12 +12,11 @@
 import TheHeader from "/src/components/TheHeader.vue";
 import ListActivities from "/src/components/ListActivities.vue";
 import FitFileUpload from '/src/components/FitFileUpload.vue';
-
 export default {
     components: {
         TheHeader,
         ListActivities,
-        FitFileUpload
+        FitFileUpload,
     },
     data() {
         return {
