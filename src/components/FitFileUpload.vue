@@ -17,7 +17,10 @@
         </button>
 
 
-        <p v-if="uploading" class="text-green-600 mt-4">Uploading...</p>
+        <div v-if="uploading" class="flex justify-center items-center mt-4">
+            <div style="background-image: conic-gradient(from 0deg, violet, indigo 30%, blue 50%, green 60%, yellow 70%, orange 80%, red 100%);"
+                class="w-14 h-14 rounded-full bg-radial bg-gradient-to-tr animate-spin [animation-delay:.7s]"></div>
+        </div>
         <p v-if="message" class="text-gray-700 mt-4">{{ message }}</p>
     </div>
 </template>

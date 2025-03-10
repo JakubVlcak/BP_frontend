@@ -4,29 +4,35 @@
             <h2 class="text-lg font-bold mb-4">Activities</h2>
         </header>
 
-        <div v-if="activities.length > 0" class="w-full max-w-md bg-white shadow rounded p-4">
+        <div v-if="activities.length > 0" class="w-full max-w-lg bg-white shadow-lg rounded-lg p-6">
             <ul>
                 <li v-for="activity in activities.slice().reverse()" :key="activity.ActivityID"
-                    class="border-b last:border-none py-2 cursor-pointer hover:bg-gray-100"
+                    class="border-b last:border-none py-4 px-4 bg-gray-50 hover:bg-gray-100 rounded-lg shadow-md transition duration-200 cursor-pointer"
                     @click="viewActivity(activity.ActivityID)">
-
-                    <!-- Display Time Created -->
-                    <div class="flex items-center justify-between">
-                        <div class="flex-1">
-                            <p>
-                                <strong>Time Started:</strong> {{ formatDate(activity.time_started) }}
-                            </p>
-                        </div>
+                    <!-- Activity Header -->
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="text-lg font-semibold"><strong>{{ formatDate(activity.time_started)
+                                }}</strong></p>
                     </div>
 
                     <!-- Activity Metrics -->
-                    <p><strong>Distance:</strong> {{ getMetrics(activity.ActivityID).distance }} km</p>
-                    <p><strong>Elapsed Time:</strong> {{ getMetrics(activity.ActivityID).elapsedTime }}</p>
+                    <div class="grid grid-cols-2 gap-4 text-gray-800">
+                        <p class="text-lg font-semibold"><strong>Distance:</strong> {{ activity.distance }} km</p>
+                        <p class="text-lg font-semibold"><strong>Elapsed Time:</strong> {{ activity.elapsed_time }}</p>
+                        <p>Avg Power: <strong> {{ roundNumber(activity.avg_power) }} W</strong></p>
+                        <p>Total Work:<strong> {{ activity.total_work_kJ }} kJ</strong></p>
+                        <p>Avg Speed:<strong> {{ activity.avg_speed }} km/h</strong></p>
+                        <p>Temperature:<strong> {{ activity.avg_temperature }} C</strong></p>
 
-                    <button @click.stop="openDeletePopup(activity.ActivityID)"
-                        class="bg-red-500 text-white px-2 py-1 rounded">
-                        Remove
-                    </button>
+                    </div>
+
+                    <!-- Remove Button -->
+                    <div class="text-left mt-4">
+                        <button @click.stop="openDeletePopup(activity.ActivityID)"
+                            class="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg transition duration-200">
+                            Remove
+                        </button>
+                    </div>
                 </li>
             </ul>
         </div>
@@ -51,7 +57,6 @@
 
 <script>
 import axiosInstance from "@/services/axiosInstance";
-import { useMetricsStore } from '@/stores/MetricsStore.js';
 
 export default {
     name: "ActivitiesList",
@@ -63,6 +68,9 @@ export default {
         };
     },
     methods: {
+        roundNumber(value) {
+            return Math.round(value);
+        },
         async fetchActivities() {
             try {
                 const response = await axiosInstance.get("http://localhost:8000/api/activities/");
@@ -100,10 +108,6 @@ export default {
             if (!timestamp) return "N/A";
             const date = new Date(timestamp);
             return date.toLocaleString();
-        },
-        getMetrics(activityId) {
-            const metricsStore = useMetricsStore();
-            return metricsStore.getMetrics(activityId) || {};
         },
         viewActivity(activityId) {
             this.$router.push({ name: 'ActivityView', params: { ActivityID: activityId } });
