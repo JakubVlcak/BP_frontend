@@ -3,8 +3,9 @@
     <div class="max-w-3xl mx-auto p-10 space-y-6">
         <FitFileUpload />
         <ListActivities />
-    </div>
 
+    </div>
+    <MyStats />
 
 </template>
 
@@ -12,11 +13,13 @@
 import TheHeader from "/src/components/TheHeader.vue";
 import ListActivities from "/src/components/ListActivities.vue";
 import FitFileUpload from '/src/components/FitFileUpload.vue';
+import MyStats from "@/components/MyStats.vue";
 export default {
     components: {
         TheHeader,
         ListActivities,
         FitFileUpload,
+        MyStats,
     },
     data() {
         return {
@@ -26,23 +29,4 @@ export default {
 };
 </script>
 
-<style>
-.container {
-    width: 100%;
-    height: 100%;
-    --s: 200px;
-    /* control the size */
-    --c1: #1d1d1d;
-    --c2: #4e4f51;
-    --c3: #3c3c3c;
-
-    background: repeating-conic-gradient(from 30deg,
-            #0000 0 120deg,
-            var(--c3) 0 180deg) calc(0.5 * var(--s)) calc(0.5 * var(--s) * 0.577),
-        repeating-conic-gradient(from 30deg,
-            var(--c1) 0 60deg,
-            var(--c2) 0 120deg,
-            var(--c3) 0 180deg);
-    background-size: var(--s) calc(var(--s) * 0.577);
-}
-</style>
+<style></style>

@@ -8,7 +8,7 @@
             <header>
                 <h2 class="text-lg font-bold mb-4">Activity Details</h2>
             </header>
-            <div v-if="records.length > 0" class="w-full max-w-4xl my-1">
+            <div v-if="records.length > 0" class="w-full max-w-5xl my-1">
                 <h3 class="text-md font-semibold mb-2">Activity Route</h3>
                 <MapChart :data="records" :latKey="'position_lat'" :longKey="'position_long'" />
             </div>
@@ -96,7 +96,13 @@
 
             <!-- Loading State -->
             <div v-else-if="loading" class="text-center">
-                <p>Loading activity details...</p>
+                <p><strong>Loading</strong></p><br>
+                <div class="flex flex-row gap-2">
+                    <div class="w-4 h-4 rounded-full bg-black animate-bounce [animation-delay:.7s]"></div>
+                    <div class="w-4 h-4 rounded-full bg-black animate-bounce [animation-delay:.3s]"></div>
+                    <div class="w-4 h-4 rounded-full bg-black animate-bounce [animation-delay:.7s]"></div>
+                </div>
+
             </div>
 
             <!-- Error State -->

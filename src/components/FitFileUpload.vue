@@ -10,16 +10,20 @@
             <p v-else class="text-gray-700">{{ file.name }}</p>
         </div>
         <input type="file" ref="fileInput" class="hidden" @change="handleFileChange" accept=".fit" />
-        <button
-            class="mt-4 w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-            @click="uploadFile" :disabled="!file">
+        <button @click="uploadFile" :disabled="!file"
+            class="mt-4 w-full bg-green-950 text-green-400 border border-green-400 border-b-1 font-medium overflow-hidden relative px-4 py-2 rounded-md hover:brightness-150 hover:border-t-4 hover:border-b active:opacity-75 outline-none duration-300 group cursor-pointer">
+            <span
+                class="bg-green-400 shadow-green-400 absolute -top-[150%] left-0 inline-flex w-80 h-[5px] rounded-md opacity-50 group-hover:top-[150%] duration-500 shadow-[0_0_10px_10px_rgba(0,0,0,0.3)]"></span>
             Upload
         </button>
 
 
         <div v-if="uploading" class="flex justify-center items-center mt-4">
-            <div style="background-image: conic-gradient(from 0deg, violet, indigo 30%, blue 50%, green 60%, yellow 70%, orange 80%, red 100%);"
-                class="w-14 h-14 rounded-full bg-radial bg-gradient-to-tr animate-spin [animation-delay:.7s]"></div>
+            <div class="flex flex-row gap-2">
+                <div class="w-4 h-4 rounded-full bg-black animate-bounce [animation-delay:.7s]"></div>
+                <div class="w-4 h-4 rounded-full bg-black animate-bounce [animation-delay:.3s]"></div>
+                <div class="w-4 h-4 rounded-full bg-black animate-bounce [animation-delay:.7s]"></div>
+            </div>
         </div>
         <p v-if="message" class="text-gray-700 mt-4">{{ message }}</p>
     </div>
