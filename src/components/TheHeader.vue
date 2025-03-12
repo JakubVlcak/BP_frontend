@@ -5,15 +5,17 @@
         <RouterLink to="/home" class="flex items-center">
           <img :src="logo" class="mr-3 h-16 w-auto sm:h-20" alt="Logo" />
           <span class="self-center text-xl font-semibold whitespace-nowrap text-white">
-            Logged in as: {{ username }}
+            <span class="text-gray-400">Logged in as:</span> {{ username }}
           </span>
         </RouterLink>
         <div class="flex items-center lg:order-2">
-          <RouterLink to="/registerpageview">
-            <a href="#"
-              class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 focus:outline-none">
-              Register
-            </a>
+          <RouterLink to="/loginpageview">
+            <button
+              class="bg-blue-950 text-blue-400 border border-blue-400 border-b-1 font-medium overflow-hidden relative px-4 py-2 rounded-md hover:brightness-150 hover:border-t-4 hover:border-b active:opacity-75 outline-none duration-300 group">
+              <span
+                class="bg-blue-400 shadow-blue-400 absolute -top-[150%] left-0 inline-flex w-80 h-[5px] rounded-md opacity-50 group-hover:top-[150%] duration-500 shadow-[0_0_10px_10px_rgba(0,0,0,0.3)]"></span>
+              Logout
+            </button>
           </RouterLink>
 
           <button data-collapse-toggle="mobile-menu-2" type="button"
@@ -51,6 +53,7 @@
     </nav>
   </header>
 </template>
+
 
 <script>
 import logo from "@/assets/logo.png";

@@ -12,8 +12,9 @@
 
 
                     <div class="flex items-center justify-between mb-2 bg-black text-white px-4 py-2 rounded-md">
-                        <p class="text-lg font-semibold">
-                            <strong>{{ activity.state }}, {{ formatDate(activity.time_started) }}</strong>
+                        <p class="text-lg">
+                            <strong>{{ activity.state }}, {{ formatDate(activity.time_started)
+                                }}</strong>
                         </p>
                     </div>
 
@@ -35,6 +36,7 @@
                                 class="bg-red-400 shadow-red-400 absolute -top-[150%] left-0 inline-flex w-80 h-[5px] rounded-md opacity-50 group-hover:top-[150%] duration-500 shadow-[0_0_10px_10px_rgba(0,0,0,0.3)]"></span>
                             Remove
                         </button>
+
                     </div>
                 </li>
             </ul>
