@@ -4,6 +4,7 @@ import LoginPageView from '@/views/LoginPageView.vue'
 import RegisterPageView from '@/views/RegisterPageView.vue'
 import DashboardView from '../views/DashboardView.vue'
 import ActivityView from '@/views/ActivityView.vue'
+import CalendarView from '@/views/CalendarView.vue'
 const routes = [
   { path: '/', name: 'loginpage', component: LoginPageView },
   { path: '/loginpageview', name: 'LoginPageView', component: LoginPageView },
@@ -19,6 +20,11 @@ const routes = [
     name: 'ActivityView',
     component: ActivityView,
     props: true, // Pass route params as props
+  },
+  {
+    path: '/calendar', // Add the calendar route here
+    name: 'calendar',
+    component: CalendarView, // The component where your calendar will be
   },
 ]
 const router = createRouter({
