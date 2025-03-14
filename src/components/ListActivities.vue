@@ -6,7 +6,7 @@
 
         <div v-if="activities.length > 0" class="w-full max-w-lg bg-white shadow-lg rounded-lg p-6">
             <ul>
-                <li v-for="activity in activities.slice().reverse()" :key="activity.ActivityID"
+                <li v-for="activity in activities" :key="activity.ActivityID"
                     class="border-b last:border-none py-3 px-3 bg-gray-50 hover:bg-gray-100 rounded-lg shadow-md transition duration-200 cursor-pointer"
                     @click="viewActivity(activity.ActivityID)">
 
@@ -14,14 +14,14 @@
                     <div class="flex items-center justify-between mb-2 bg-black text-white px-4 py-2 rounded-md">
                         <p class="text-lg">
                             <strong>{{ activity.state }}, {{ formatDate(activity.time_started)
-                                }}</strong>
+                            }}</strong>
                         </p>
                     </div>
 
 
                     <div class="grid grid-cols-2 gap-1 text-gray-800">
                         <p><strong>Distance:</strong> {{ activity.distance }} km</p>
-                        <p><strong>Elapsed Time:</strong> {{ activity.elapsed_time }}</p>
+                        <p><strong>Elapsed Time:</strong> {{ formatElapsedTime(activity.elapsed_time) }}</p>
                         <p><strong>Avg Power:</strong> {{ roundNumber(activity.avg_power) }} W</p>
                         <p><strong>Total Work:</strong> {{ activity.total_work_kJ }} kJ</p>
                         <p><strong>Avg Speed:</strong> {{ activity.avg_speed }} km/h</p>
@@ -127,6 +127,11 @@ export default {
                 this.fetchActivities(page);
             }
         },
+        formatElapsedTime(timeString) {
+            if (!timeString) return "N/A";
+            const [hours, minutes] = timeString.split(":").map(Number);
+            return `${hours}h ${minutes}min`;
+        },
         async fetchActivities(page = 1) {
             try {
                 const response = await axiosInstance.get(
@@ -135,6 +140,13 @@ export default {
 
                 this.activities = response.data.results;
 
+                this.activities.sort((a, b) => {
+                    const timeA = new Date(a.time_started);
+                    const timeB = new Date(b.time_started);
+
+
+                    return timeB - timeA;
+                });
 
                 for (const activity of this.activities) {
                     activity.state = await this.getNearestState(activity.position_lat, activity.position_long);

@@ -1,68 +1,129 @@
 <template>
     <TheHeader />
     <div class="calendar-container p-4">
-        <h1 class="text-2xl font-bold mb-4">Schedule</h1>
+        <h1 class="text-2xl font-bold mb-4">Training Calendar</h1>
         <ScheduleXCalendar :calendar-app="calendarApp" />
     </div>
 </template>
 
 <script setup>
 import { shallowRef, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { ScheduleXCalendar } from '@schedule-x/vue'
-import { createCalendar, createViewMonthGrid, createViewWeek, createViewDay } from '@schedule-x/calendar'
+import { createCalendar, createViewMonthGrid } from '@schedule-x/calendar'
+import { createEventsServicePlugin } from '@schedule-x/events-service'
 import '@schedule-x/theme-default/dist/calendar.css'
-import axios from 'axios'
 import TheHeader from '@/components/TheHeader.vue'
+import axiosInstance from '@/services/axiosInstance'
+
+const router = useRouter();
+const eventsServicePlugin = createEventsServicePlugin();
+
+function getCurrentDate() {
+    return new Date().toISOString().split('T')[0];
+}
 
 const calendarApp = shallowRef(createCalendar({
     views: [
-        createViewWeek(),
         createViewMonthGrid(),
-        createViewDay(),
     ],
-    selectedDate: "2025-01-11",
-    events: [] // This will hold the events for the calendar
-}))
-
-// Fetch activities from API and format them for the calendar
-async function fetchActivities(page = 1) {
-    try {
-        // Replace 'YOUR_API_TOKEN' with the actual token
-        const response = await axios.get(
-            `http://localhost:8000/api/activities/?page=${page}&limit=5`, {
-            headers: {
-                Authorization: `Token 42c85e2a09ad06c49e843b41a5e7e2f799500f0f` // Bearer token for authentication
-            }
+    callbacks: {
+        onEventUpdate() {
+            fetchAllActivities();
+        },
+        onEventClick(calendarEvent) {
+            console.log('onEventClick', calendarEvent);
+            viewActivity(calendarEvent.id);
         }
-        )
+    },
+    selectedDate: getCurrentDate(),
+}, [eventsServicePlugin]));
 
-        const activities = response.data.results
-        const events = activities.map(activity => {
-            return {
-                id: activity.ActivityID,
-                title: `Activity ${activity.ActivityID} - ${activity.distance} km`,
-                start: activity.time_started,
-                end: activity.time_started,
-                description: `Avg Speed: ${activity.avg_speed} km/h, Max Speed: ${activity.max_speed} km/h`,
-                location: `${activity.position_lat}, ${activity.position_long}`
-            }
-        })
+function viewActivity(activityId) {
+    router.push({ name: 'ActivityView', params: { ActivityID: activityId } });
+}
 
-        calendarApp.value.events = events
+function formatDate(dateTime) {
+    return dateTime.split('T')[0];
+}
 
+function formatElapsedTime(timeString) {
+    if (!timeString) return "N/A";
+    const [hours, minutes] = timeString.split(":").map(Number);
+    return `${hours}h ${minutes}min`;
+}
+
+async function fetchAllActivities(page = 1, allActivities = []) {
+    try {
+        const response = await axiosInstance.get(
+            `http://localhost:8000/api/activities/?page=${page}&limit=50`
+        );
+
+        const activities = response.data.results;
+        allActivities.push(...activities);
+
+        if (response.data.next) {
+            return fetchAllActivities(page + 1, allActivities);
+        }
+
+        const events = allActivities.map(activity => ({
+            id: activity.ActivityID,
+            title: `${activity.distance} km`,
+            start: formatDate(activity.time_started),
+            end: formatDate(activity.time_started),
+            _customContent: {
+                monthGrid: `<div><strong>${activity.distance} km</strong></div>
+                    <div>Elapsed time: ${formatElapsedTime(activity.elapsed_time)}</div>`,
+            },
+        }));
+
+        eventsServicePlugin.set(events);
     } catch (error) {
-        console.error("Error fetching activities:", error)
+        console.error("Error fetching activities:", error);
     }
 }
 
 onMounted(() => {
-    fetchActivities() // Fetch the activities when the component is mounted
-})
+    fetchAllActivities();
+});
+
 </script>
 
 <style scoped>
 .calendar-container {
     max-width: 1200px;
     margin: auto;
+}
+
+:deep(.sx__event) {
+    min-height: 40px;
+    /* Adjust the height */
+    padding: 4px;
+    /* Add padding for better spacing */
+    font-size: 14px;
+    /* Increase text size */
+    line-height: 1.5;
+    /* Improve text readability */
+}
+
+:deep(.sx__event) {
+    background-color: #121828 !important;
+    /* Green */
+    color: white !important;
+    /* White text */
+    --sx-color-primary: #000000;
+    /* --sx-color-on-primary: #fd0303; */
+}
+
+.sx-vue-calendar-wrapper {
+    width: 1200px;
+    max-width: 100vw;
+    height: 800px;
+    max-height: 90vh;
+}
+
+.sx__month-grid-day__header-date.sx__is-today {
+    background-color: #000000;
+    color: var(--sx-color-on-primary);
 }
 </style>
