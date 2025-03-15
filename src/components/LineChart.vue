@@ -41,10 +41,18 @@ export default {
         renderChart() {
             d3.select(this.$refs.chart).selectAll('*').remove();
 
-            const filteredData = this.data.filter(d => d[this.yKey] !== 0);
-            if (filteredData.length === 0) {
-                console.warn('No valid data to display.');
-                return;
+            const threshold = 30 * 1000; // 30 seconds gap threshold
+            // eslint-disable-next-line vue/no-mutating-props
+            const sortedData = this.data.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+            let filteredData = [];
+            for (let i = 1; i < sortedData.length; i++) {
+                const prevTimestamp = new Date(sortedData[i - 1].timestamp).getTime();
+                const currTimestamp = new Date(sortedData[i].timestamp).getTime();
+
+                if (currTimestamp - prevTimestamp <= threshold) {
+                    filteredData.push(sortedData[i]);
+                }
             }
 
             const containerWidth = this.$refs.chartContainer.clientWidth;
@@ -85,7 +93,8 @@ export default {
             // Line generator
             const line = d3.line()
                 .x(d => x(d.timestamp))
-                .y(d => y(d.value));
+                .y(d => y(d.value))
+                .defined(d => d.value !== null); // This skips undefined data points
 
             // Area generator
             const area = d3.area()

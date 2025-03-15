@@ -16,15 +16,15 @@ const routes = [
     component: RegisterPageView,
   },
   {
-    path: '/activity/:ActivityID', // Use :ActivityID instead of :id
+    path: '/activity/:ActivityID',
     name: 'ActivityView',
     component: ActivityView,
-    props: true, // Pass route params as props
+    props: true,
   },
   {
-    path: '/calendar', // Add the calendar route here
+    path: '/calendar',
     name: 'calendar',
-    component: CalendarView, // The component where your calendar will be
+    component: CalendarView,
   },
 ]
 const router = createRouter({

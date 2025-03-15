@@ -2,8 +2,6 @@
     <div>
         <TheHeader />
 
-
-
         <section class="flex flex-col items-center justify-center min-h-screen pt-10 px-4">
             <header>
                 <h2 class="text-lg font-bold mb-4">Activity Details</h2>
@@ -20,23 +18,37 @@
                 <!-- Display Metrics -->
                 <div v-if="metrics" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 my-6">
                     <div class="text-center">
-                        <p class="text-2xl font-bold">{{ metrics.distance }} km</p>
+                        <p class="text-2xl font-bold">{{ activity.distance }} km</p>
                         <p class="text-sm text-gray-600">Distance</p>
                     </div>
                     <div class="text-center">
-                        <p class="text-2xl font-bold">{{ metrics.elapsedTime }}</p>
+                        <p class="text-2xl font-bold">{{ activity.elapsed_time }}</p>
                         <p class="text-sm text-gray-600">Elapsed Time</p>
                     </div>
                     <div class="text-center">
-                        <p class="text-2xl font-bold">{{ metrics.elevation }} m</p>
-                        <p class="text-sm text-gray-600">Elevation</p>
+                        <h1 class="font-bold">Power output</h1>
+                        <p class="text-2xl font-bold">{{ activity.avg_power }} m</p>
+                        <p class="text-sm text-gray-600">Avgerage power</p>
+                        <p class="text-2xl font-bold">{{ activity.total_work_kJ }} m</p>
+                        <p class="text-sm text-gray-600">Total Work kJ</p>
+                        <p class="text-2xl font-bold">{{ activity.best_5s_power }} m</p>
+                        <p class="text-sm text-gray-600">best 5s</p>
                     </div>
                     <div class="text-center">
-                        <p class="text-2xl font-bold">{{ metrics.avgPower }} w</p>
+                        <p class="text-2xl font-bold">{{ activity.avg_power }} w</p>
+                        <p class="text-sm text-gray-600">Weighted Avg Power</p>
+                        <p class="text-2xl font-bold">{{ activity.avg_power }} w</p>
+                        <p class="text-sm text-gray-600">Weighted Avg Power</p>
+                        <p class="text-2xl font-bold">{{ activity.avg_power }} w</p>
                         <p class="text-sm text-gray-600">Weighted Avg Power</p>
                     </div>
                     <div class="text-center">
-                        <p class="text-2xl font-bold">{{ metrics.totalWork }} kJ</p>
+                        <h1 class="font-bold">Hearth rate</h1>
+                        <p class="text-2xl font-bold">{{ activity.total_work_kJ }} kJ</p>
+                        <p class="text-sm text-gray-600">Total Work</p>
+                        <p class="text-2xl font-bold">{{ activity.total_work_kJ }} kJ</p>
+                        <p class="text-sm text-gray-600">Total Work</p>
+                        <p class="text-2xl font-bold">{{ activity.total_work_kJ }} kJ</p>
                         <p class="text-sm text-gray-600">Total Work</p>
                     </div>
                 </div>
@@ -56,6 +68,7 @@
                     <button @click="toggleChart('temperature')" class="px-4 py-2 bg-pink-500 text-white rounded">Toggle
                         Temperature</button>
                 </div>
+
 
                 <!-- Display Charts -->
                 <div v-if="records && records.length > 0" class="relative h-96">
@@ -120,6 +133,7 @@
 </template>
 
 <script>
+import MyStats from "@/components/MyStats.vue";
 import axiosInstance from "@/services/axiosInstance";
 import TheHeader from '@/components/TheHeader.vue';
 import LineChart from '@/components/LineChart.vue';
@@ -130,7 +144,8 @@ export default {
     components: {
         TheHeader,
         LineChart,
-        MapChart
+        MapChart,
+        MyStats
     },
     data() {
         return {
