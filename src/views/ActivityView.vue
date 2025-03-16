@@ -15,43 +15,78 @@
                 <p><strong>Activity ID:</strong> {{ activity.ActivityID }}</p>
                 <p><strong>Time Created:</strong> {{ formatDate(activity.timeCreated) }}</p>
 
-                <!-- Display Metrics -->
-                <div v-if="metrics" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 my-6">
-                    <div class="text-center">
-                        <p class="text-2xl font-bold">{{ activity.distance }} km</p>
-                        <p class="text-sm text-gray-600">Distance</p>
-                    </div>
-                    <div class="text-center">
-                        <p class="text-2xl font-bold">{{ activity.elapsed_time }}</p>
-                        <p class="text-sm text-gray-600">Elapsed Time</p>
-                    </div>
-                    <div class="text-center">
-                        <h1 class="font-bold">Power output</h1>
-                        <p class="text-2xl font-bold">{{ activity.avg_power }} m</p>
-                        <p class="text-sm text-gray-600">Avgerage power</p>
-                        <p class="text-2xl font-bold">{{ activity.total_work_kJ }} m</p>
-                        <p class="text-sm text-gray-600">Total Work kJ</p>
-                        <p class="text-2xl font-bold">{{ activity.best_5s_power }} m</p>
-                        <p class="text-sm text-gray-600">best 5s</p>
-                    </div>
-                    <div class="text-center">
-                        <p class="text-2xl font-bold">{{ activity.avg_power }} w</p>
-                        <p class="text-sm text-gray-600">Weighted Avg Power</p>
-                        <p class="text-2xl font-bold">{{ activity.avg_power }} w</p>
-                        <p class="text-sm text-gray-600">Weighted Avg Power</p>
-                        <p class="text-2xl font-bold">{{ activity.avg_power }} w</p>
-                        <p class="text-sm text-gray-600">Weighted Avg Power</p>
-                    </div>
-                    <div class="text-center">
-                        <h1 class="font-bold">Hearth rate</h1>
-                        <p class="text-2xl font-bold">{{ activity.total_work_kJ }} kJ</p>
-                        <p class="text-sm text-gray-600">Total Work</p>
-                        <p class="text-2xl font-bold">{{ activity.total_work_kJ }} kJ</p>
-                        <p class="text-sm text-gray-600">Total Work</p>
-                        <p class="text-2xl font-bold">{{ activity.total_work_kJ }} kJ</p>
-                        <p class="text-sm text-gray-600">Total Work</p>
-                    </div>
+                <!-- Display Metrics as Table -->
+                <div v-if="metrics" class="overflow-x-auto my-6">
+                    <table class="table-auto w-full border-collapse border border-gray-300">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="border px-4 py-2">Metric</th>
+                                <th class="border px-4 py-2">Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="border px-4 py-2">Distance</td>
+                                <td class="border px-4 py-2">{{ activity.distance }} km</td>
+                            </tr>
+                            <tr>
+                                <td class="border px-4 py-2">Elapsed Time</td>
+                                <td class="border px-4 py-2">{{ activity.elapsed_time }}</td>
+                            </tr>
+                            <tr>
+                                <td class="border px-4 py-2">Average Power</td>
+                                <td class="border px-4 py-2">{{ activity.avg_power }} W</td>
+                            </tr>
+                            <tr>
+                                <td class="border px-4 py-2">Total Work</td>
+                                <td class="border px-4 py-2">{{ activity.total_work_kJ }} kJ</td>
+                            </tr>
+                            <tr>
+                                <td class="border px-4 py-2">Best 5s Power</td>
+                                <td class="border px-4 py-2">{{ activity.best_5s_power }} W</td>
+                            </tr>
+                            <tr>
+                                <td class="border px-4 py-2">Best 15s Power</td>
+                                <td class="border px-4 py-2">{{ activity.best_15s_power }} W</td>
+                            </tr>
+                            <tr>
+                                <td class="border px-4 py-2">Best 1min Power</td>
+                                <td class="border px-4 py-2">{{ activity.best_1min_power }} W</td>
+                            </tr>
+                            <tr>
+                                <td class="border px-4 py-2">Best 5min Power</td>
+                                <td class="border px-4 py-2">{{ activity.best_5min_power }} W</td>
+                            </tr>
+                            <tr>
+                                <td class="border px-4 py-2">Best 20min Power</td>
+                                <td class="border px-4 py-2">{{ activity.best_20min_power }} W</td>
+                            </tr>
+                            <tr>
+                                <td class="border px-4 py-2">Cadence (Avg/Max)</td>
+                                <td class="border px-4 py-2">{{ activity.avg_cadence }} / {{ activity.max_cadence }} rpm
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border px-4 py-2">Speed (Avg/Max)</td>
+                                <td class="border px-4 py-2">{{ activity.avg_speed }} / {{ activity.max_speed }} km/h
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border px-4 py-2">Temperature</td>
+                                <td class="border px-4 py-2">{{ activity.avg_temperature }} °C</td>
+                            </tr>
+                            <tr>
+                                <td class="border px-4 py-2">Total Ascended Elevation</td>
+                                <td class="border px-4 py-2">{{ activity.ascended_elevation }} m</td>
+                            </tr>
+                            <tr>
+                                <td class="border px-4 py-2">Heart Rate (Avg/Max)</td>
+                                <td class="border px-4 py-2">{{ activity.avg_heartrate }} bpm</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
+
 
                 <!-- Display Toggle Buttons -->
                 <div class="mb-4">
@@ -133,7 +168,6 @@
 </template>
 
 <script>
-import MyStats from "@/components/MyStats.vue";
 import axiosInstance from "@/services/axiosInstance";
 import TheHeader from '@/components/TheHeader.vue';
 import LineChart from '@/components/LineChart.vue';
@@ -145,7 +179,6 @@ export default {
         TheHeader,
         LineChart,
         MapChart,
-        MyStats
     },
     data() {
         return {

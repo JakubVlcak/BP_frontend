@@ -73,7 +73,7 @@ async function fetchAllActivities(page = 1, allActivities = []) {
             end: formatDate(activity.time_started),
             _customContent: {
                 monthGrid: `<div><strong>${activity.distance} km</strong></div>
-                    <div>Elapsed time: ${formatElapsedTime(activity.elapsed_time)}</div>`,
+                    <div>Time: ${formatElapsedTime(activity.elapsed_time)}</div>`,
             },
         }));
 
@@ -97,20 +97,14 @@ onMounted(() => {
 
 :deep(.sx__event) {
     min-height: 40px;
-    /* Adjust the height */
     padding: 4px;
-    /* Add padding for better spacing */
     font-size: 14px;
-    /* Increase text size */
     line-height: 1.5;
-    /* Improve text readability */
 }
 
 :deep(.sx__event) {
     background-color: #121828 !important;
-    /* Green */
     color: white !important;
-    /* White text */
     --sx-color-primary: #000000;
     /* --sx-color-on-primary: #fd0303; */
 }
