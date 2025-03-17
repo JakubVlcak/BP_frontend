@@ -10,86 +10,21 @@
                 <h3 class="text-md font-semibold mb-2">Activity Route</h3>
                 <MapChart :data="records" :latKey="'position_lat'" :longKey="'position_long'" />
             </div>
-            <!-- Display Activity ID -->
+
             <div v-if="activity" class="w-full max-w-full bg-white shadow rounded p-4">
                 <p><strong>Activity ID:</strong> {{ activity.ActivityID }}</p>
                 <p><strong>Time Created:</strong> {{ formatDate(activity.timeCreated) }}</p>
 
-                <!-- Display Metrics as Table -->
-                <div v-if="metrics" class="overflow-x-auto my-6">
-                    <table class="table-auto w-full border-collapse border border-gray-300">
-                        <thead>
-                            <tr class="bg-gray-200">
-                                <th class="border px-4 py-2">Metric</th>
-                                <th class="border px-4 py-2">Value</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="border px-4 py-2">Distance</td>
-                                <td class="border px-4 py-2">{{ activity.distance }} km</td>
-                            </tr>
-                            <tr>
-                                <td class="border px-4 py-2">Elapsed Time</td>
-                                <td class="border px-4 py-2">{{ activity.elapsed_time }}</td>
-                            </tr>
-                            <tr>
-                                <td class="border px-4 py-2">Average Power</td>
-                                <td class="border px-4 py-2">{{ activity.avg_power }} W</td>
-                            </tr>
-                            <tr>
-                                <td class="border px-4 py-2">Total Work</td>
-                                <td class="border px-4 py-2">{{ activity.total_work_kJ }} kJ</td>
-                            </tr>
-                            <tr>
-                                <td class="border px-4 py-2">Best 5s Power</td>
-                                <td class="border px-4 py-2">{{ activity.best_5s_power }} W</td>
-                            </tr>
-                            <tr>
-                                <td class="border px-4 py-2">Best 15s Power</td>
-                                <td class="border px-4 py-2">{{ activity.best_15s_power }} W</td>
-                            </tr>
-                            <tr>
-                                <td class="border px-4 py-2">Best 1min Power</td>
-                                <td class="border px-4 py-2">{{ activity.best_1min_power }} W</td>
-                            </tr>
-                            <tr>
-                                <td class="border px-4 py-2">Best 5min Power</td>
-                                <td class="border px-4 py-2">{{ activity.best_5min_power }} W</td>
-                            </tr>
-                            <tr>
-                                <td class="border px-4 py-2">Best 20min Power</td>
-                                <td class="border px-4 py-2">{{ activity.best_20min_power }} W</td>
-                            </tr>
-                            <tr>
-                                <td class="border px-4 py-2">Cadence (Avg/Max)</td>
-                                <td class="border px-4 py-2">{{ activity.avg_cadence }} / {{ activity.max_cadence }} rpm
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="border px-4 py-2">Speed (Avg/Max)</td>
-                                <td class="border px-4 py-2">{{ activity.avg_speed }} / {{ activity.max_speed }} km/h
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="border px-4 py-2">Temperature</td>
-                                <td class="border px-4 py-2">{{ activity.avg_temperature }} °C</td>
-                            </tr>
-                            <tr>
-                                <td class="border px-4 py-2">Total Ascended Elevation</td>
-                                <td class="border px-4 py-2">{{ activity.ascended_elevation }} m</td>
-                            </tr>
-                            <tr>
-                                <td class="border px-4 py-2">Heart Rate (Avg/Max)</td>
-                                <td class="border px-4 py-2">{{ activity.avg_heartrate }} bpm</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <!-- Grid Layout for Metrics -->
+                <div v-if="metrics" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 my-6">
+                    <div v-for="(value, key) in activityMetrics" :key="key" class="bg-gray-100 p-4 rounded shadow">
+                        <p class="font-semibold">{{ key }}</p>
+                        <p class="text-lg">{{ value }}</p>
+                    </div>
                 </div>
 
-
                 <!-- Display Toggle Buttons -->
-                <div class="mb-4">
+                <div class="mb-4 flex flex-wrap gap-2">
                     <button @click="toggleChart('altitude')" class="px-4 py-2 bg-green-500 text-white rounded">Toggle
                         Altitude</button>
                     <button @click="toggleChart('speed')" class="px-4 py-2 bg-blue-500 text-white rounded">Toggle
@@ -104,25 +39,20 @@
                         Temperature</button>
                 </div>
 
-
                 <!-- Display Charts -->
                 <div v-if="records && records.length > 0" class="relative h-96">
-                    <!-- Altitude -->
                     <div v-if="showAltitude">
                         <h3 class="text-md font-semibold mb-2">Altitude</h3>
                         <LineChart :data="records" :yKey="'altitude'" :lineColor="'green'" />
                     </div>
-                    <!-- Speed -->
                     <div v-if="showSpeed">
                         <h3 class="text-md font-semibold mb-2">Speed</h3>
                         <LineChart :data="speedData" :yKey="'speed'" :lineColor="'blue'" />
                     </div>
-                    <!-- Power -->
                     <div v-if="showPower">
                         <h3 class="text-md font-semibold mb-2">Power</h3>
                         <LineChart :data="records" :yKey="'power'" :lineColor="'purple'" />
                     </div>
-                    <!-- Heart Rate -->
                     <div v-if="showHeartRate">
                         <h3 class="text-md font-semibold mb-2">Heart Rate</h3>
                         <LineChart :data="records" :yKey="'heartRate'" :lineColor="'red'" />
@@ -131,7 +61,6 @@
                         <h3 class="text-md font-semibold mb-2">Cadence Records</h3>
                         <LineChart :data="records" :yKey="'cadence'" :lineColor="'orange'" />
                     </div>
-                    <!-- Temperature -->
                     <div v-if="showTemperature">
                         <h3 class="text-md font-semibold mb-2">Temperature</h3>
                         <LineChart :data="records" :yKey="'temperature'" :lineColor="'pink'" />
@@ -142,7 +71,6 @@
                 </div>
             </div>
 
-            <!-- Loading State -->
             <div v-else-if="loading" class="text-center">
                 <p><strong>Loading</strong></p><br>
                 <div class="flex flex-row gap-2">
@@ -150,21 +78,17 @@
                     <div class="w-4 h-4 rounded-full bg-black animate-bounce [animation-delay:.3s]"></div>
                     <div class="w-4 h-4 rounded-full bg-black animate-bounce [animation-delay:.7s]"></div>
                 </div>
-
             </div>
 
-            <!-- Error State -->
             <div v-else-if="error" class="text-center text-red-500">
                 <p>Error loading activity details: {{ error }}</p>
             </div>
 
-            <!-- No Activity Found -->
             <div v-else class="text-center">
                 <p>No activity found.</p>
             </div>
         </section>
     </div>
-
 </template>
 
 <script>
@@ -196,6 +120,24 @@ export default {
         };
     },
     computed: {
+        activityMetrics() {
+            return {
+                'Distance': `${this.activity.distance} km`,
+                'Elapsed Time': this.activity.elapsed_time,
+                'Average Power': `${this.activity.avg_power} W`,
+                'Total Work': `${this.activity.total_work_kJ} kJ`,
+                'Best 5s Power': `${this.activity.best_5s_power} W`,
+                'Best 15s Power': `${this.activity.best_15s_power} W`,
+                'Best 1min Power': `${this.activity.best_1min_power} W`,
+                'Best 5min Power': `${this.activity.best_5min_power} W`,
+                'Best 20min Power': `${this.activity.best_20min_power} W`,
+                'Cadence (Avg/Max)': `${this.activity.avg_cadence} / ${this.activity.max_cadence} rpm`,
+                'Speed (Avg/Max)': `${this.activity.avg_speed} / ${this.activity.max_speed} km/h`,
+                'Temperature': `${this.activity.avg_temperature} °C`,
+                'Total Ascended Elevation': `${this.activity.ascended_elevation} m`,
+                'Heart Rate (Avg/Max)': `${this.activity.avg_heartrate} / ${this.activity.max_heartrate} bpm`
+            };
+        },
         speedData() {
             return this.records
                 .filter(record => record.speed > 0) // Filter out records with 0 speed
