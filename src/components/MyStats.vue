@@ -3,9 +3,9 @@
         <p
             class="flex items-center justify-between mb-2 bg-black text-white px-4 py-2 rounded-md text-lg font-semibold">
             All-time Stats</p>
-        <table class="w-full border-collapse  border-white-500 bg-gray-50 text-gray-800 font-semibold rounded-lg ">
+        <table class="w-full border-collapse border-white-500 bg-gray-50 text-gray-800 font-semibold rounded-lg">
             <tbody>
-                <tr class="border-b border-black ">
+                <tr class="border-b border-black">
                     <td class="p-2 font-semibold">Total Activities:</td>
                     <td class="p-2">{{ stats.total_activities }}</td>
                 </tr>
@@ -28,9 +28,9 @@
         <p
             class="flex items-center justify-between mb-2 bg-black text-white px-4 py-2 rounded-md text-lg font-semibold">
             Best Efforts</p>
-        <table class="w-full border-collapse  border-white-500 bg-gray-50 text-gray-800 font-semibold rounded-lg ">
+        <table class="w-full border-collapse border-white-500 bg-gray-50 text-gray-800 font-semibold rounded-lg">
             <tbody>
-                <tr class="border-b border-black ">
+                <tr class="border-b border-black">
                     <td class="p-2 font-semibold">Longest ride:</td>
                     <td class="p-2">{{ stats.longest_ride }} km</td>
                 </tr>
@@ -85,7 +85,7 @@ import axiosInstance from "@/services/axiosInstance";
 export default {
     data() {
         return {
-            stats: {},
+            stats: JSON.parse(localStorage.getItem("stats")) || {},
         };
     },
     async mounted() {
@@ -94,8 +94,12 @@ export default {
     methods: {
         async fetchStats() {
             try {
-                const response = await axiosInstance.get(`http://localhost:8000/api/stats/`);
-                this.stats = response.data;
+                const response = await axiosInstance.get("http://localhost:8000/api/stats/");
+                const newStats = response.data;
+                if (JSON.stringify(newStats) !== JSON.stringify(this.stats)) {
+                    this.stats = newStats;
+                    localStorage.setItem("stats", JSON.stringify(newStats));
+                }
             } catch (error) {
                 console.error("Error fetching activities:", error);
             }

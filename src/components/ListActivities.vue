@@ -14,7 +14,7 @@
                     <div class="flex items-center justify-between mb-2 bg-black text-white px-4 py-2 rounded-md">
                         <p class="text-lg">
                             <strong>{{ activity.state }}, {{ formatDate(activity.time_started)
-                            }}</strong>
+                                }}</strong>
                         </p>
                     </div>
 
@@ -213,7 +213,13 @@ export default {
         formatDate(timestamp) {
             if (!timestamp) return "N/A";
             const date = new Date(timestamp);
-            return date.toLocaleString();
+            return date.toLocaleString(undefined, {
+                year: 'numeric',
+                month: 'numeric',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
         },
         viewActivity(activityId) {
             this.$router.push({ name: 'ActivityView', params: { ActivityID: activityId } });

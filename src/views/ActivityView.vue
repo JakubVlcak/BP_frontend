@@ -16,8 +16,8 @@
                 <p><strong>Time Created:</strong> {{ formatDate(activity.timeCreated) }}</p>
 
                 <!-- Grid Layout for Metrics -->
-                <div v-if="metrics" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 my-6">
-                    <div v-for="(value, key) in activityMetrics" :key="key" class="bg-gray-100 p-4 rounded shadow">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 my-6">
+                    <div v-for="(value, key) in activityMetrics" :key="key" class="bg-gray-100 p-1 rounded shadow">
                         <p class="font-semibold">{{ key }}</p>
                         <p class="text-lg">{{ value }}</p>
                     </div>
@@ -25,17 +25,23 @@
 
                 <!-- Display Toggle Buttons -->
                 <div class="mb-4 flex flex-wrap gap-2">
-                    <button @click="toggleChart('altitude')" class="px-4 py-2 bg-green-500 text-white rounded">Toggle
+                    <button @click="toggleChart('altitude')"
+                        class="px-4 py-2 bg-green-950 text-green-400 font-bold rounded border-green-400 border-2">Toggle
                         Altitude</button>
-                    <button @click="toggleChart('speed')" class="px-4 py-2 bg-blue-500 text-white rounded">Toggle
+                    <button @click="toggleChart('speed')"
+                        class="px-4 py-2 bg-blue-950 text-blue-400 font-bold rounded border-blue-400 border-2">Toggle
                         Speed</button>
-                    <button @click="toggleChart('power')" class="px-4 py-2 bg-purple-500 text-white rounded">Toggle
+                    <button @click="toggleChart('power')"
+                        class="px-4 py-2 bg-purple-950 text-purple-400 font-bold rounded border-purple-400 border-2">Toggle
                         Power</button>
-                    <button @click="toggleChart('heartRate')" class="px-4 py-2 bg-red-500 text-white rounded">Toggle
+                    <button @click="toggleChart('heartRate')"
+                        class="px-4 py-2 bg-red-950 text-red-400 font-bold rounded border-red-400 border-2">Toggle
                         Heart Rate</button>
-                    <button @click="toggleChart('cadence')" class="px-4 py-2 bg-orange-500 text-white rounded">Toggle
+                    <button @click="toggleChart('cadence')"
+                        class="px-4 py-2 bg-orange-950 text-orange-400 font-bold rounded border-orange-400  border-2">Toggle
                         Cadence</button>
-                    <button @click="toggleChart('temperature')" class="px-4 py-2 bg-pink-500 text-white rounded">Toggle
+                    <button @click="toggleChart('temperature')"
+                        class="px-4 py-2 bg-pink-950 text-pink-400 font-bold rounded border-pink-400 border-2">Toggle
                         Temperature</button>
                 </div>
 
@@ -96,7 +102,7 @@ import axiosInstance from "@/services/axiosInstance";
 import TheHeader from '@/components/TheHeader.vue';
 import LineChart from '@/components/LineChart.vue';
 import MapChart from "@/components/MapChart.vue";
-import { useMetricsStore } from '@/stores/MetricsStore.js';
+
 
 export default {
     components: {
@@ -124,7 +130,7 @@ export default {
             return {
                 'Distance': `${this.activity.distance} km`,
                 'Elapsed Time': this.activity.elapsed_time,
-                'Average Power': `${this.activity.avg_power} W`,
+                'Average Power': `${Math.round(this.activity.avg_power)} W`,
                 'Total Work': `${this.activity.total_work_kJ} kJ`,
                 'Best 5s Power': `${this.activity.best_5s_power} W`,
                 'Best 15s Power': `${this.activity.best_15s_power} W`,
@@ -153,16 +159,9 @@ export default {
                 const activityId = this.$route.params.ActivityID;
                 const response = await axiosInstance.get(`/api/activities/${activityId}/`);
                 const response2 = await axiosInstance.get(`/api/activities/${activityId}/records/`);
-
-                console.log("Activity Response:", response.data);
-                console.log("Records Response:", response2.data);
-
                 this.activity = response.data;
                 this.records = response2.data;
-                const metricsStore = useMetricsStore();
-                this.metrics = metricsStore.getMetrics(activityId);  // Set metrics to the component data
 
-                this.calculateMetrics(response2.data, activityId);
             } catch (error) {
                 console.error("Error fetching activity details:", error);
                 this.error = "Failed to load activity details. Please try again later.";
@@ -172,49 +171,6 @@ export default {
         },
         toggleChart(chart) {
             this[`show${chart.charAt(0).toUpperCase() + chart.slice(1)}`] = !this[`show${chart.charAt(0).toUpperCase() + chart.slice(1)}`];
-        },
-        calculateMetrics(records, activityId) {
-            if (!records || records.length === 0) return;
-
-            const distance = records[records.length - 1].distance;
-            const distanceKm = (distance / 1000).toFixed(2);
-
-            const startTime = new Date(records[0].timestamp);
-            const endTime = new Date(records[records.length - 1].timestamp);
-            const movingTimeMs = endTime - startTime;
-            const movingTimeSeconds = movingTimeMs / 1000;
-            const elapsedTime = new Date(movingTimeMs).toISOString().substr(11, 8);
-
-            // Ascended elevation
-            let ascendedElevation = 0;
-            for (let i = 1; i < records.length; i++) {
-                const prevAltitude = parseFloat(records[i - 1].altitude);
-                const currentAltitude = parseFloat(records[i].altitude);
-
-                if (!isNaN(prevAltitude) && !isNaN(currentAltitude) && currentAltitude > prevAltitude) {
-                    ascendedElevation += currentAltitude - prevAltitude;
-                }
-            }
-
-            const totalPower = records.reduce((acc, record) => {
-                const power = parseFloat(record.power);
-                return acc + (isNaN(power) ? 0 : power);
-            }, 0);
-            const avgPower = (totalPower / records.length).toFixed(0);
-
-            const totalWork = (avgPower * movingTimeSeconds / 1000).toFixed(0);
-
-            // Store the metrics in Pinia
-            const metrics = {
-                distance: distanceKm,
-                elapsedTime,
-                elevation: ascendedElevation.toFixed(0),
-                avgPower,
-                totalWork,
-            };
-
-            const metricsStore = useMetricsStore();
-            metricsStore.setMetrics(activityId, metrics);
         },
         formatDate(timestamp) {
             const date = new Date(timestamp);

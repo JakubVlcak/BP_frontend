@@ -77,7 +77,7 @@ export default {
         return {
             username: "",
             password: "",
-            rememberMe: false, // Track the "Remember Me" checkbox state
+            rememberMe: false,
             error: null,
             success: false,
             apiUrl: API_URL,
@@ -102,12 +102,10 @@ export default {
                 localStorage.setItem("authToken", token);
                 localStorage.setItem("username", username)
 
-                // Save credentials if "Remember Me" is checked
                 if (this.rememberMe) {
                     localStorage.setItem("rememberedUsername", this.username);
                     localStorage.setItem("rememberedPassword", this.password);
                 } else {
-                    // Clear saved credentials if "Remember Me" is unchecked
                     localStorage.removeItem("rememberedUsername");
                     localStorage.removeItem("rememberedPassword");
                 }
@@ -121,14 +119,13 @@ export default {
         },
     },
     beforeMount() {
-        // Check if credentials are saved in localStorage
         const rememberedUsername = localStorage.getItem("rememberedUsername");
         const rememberedPassword = localStorage.getItem("rememberedPassword");
 
         if (rememberedUsername && rememberedPassword) {
             this.username = rememberedUsername;
             this.password = rememberedPassword;
-            this.rememberMe = true; // Check the "Remember Me" checkbox
+            this.rememberMe = true;
         }
     },
 };
