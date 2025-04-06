@@ -40,14 +40,6 @@
               </RouterLink>
             </li>
             <li>
-              <RouterLink to="/registerpageview">
-                <a href="#"
-                  class="block py-2 pr-4 pl-3 text-gray-400 border-b border-gray-600 hover:bg-gray-800 lg:hover:bg-transparent lg:border-0 lg:hover:text-blue-400 lg:p-0">
-                  Register
-                </a>
-              </RouterLink>
-            </li>
-            <li>
               <RouterLink to="/calendar">
                 <a href="#"
                   class="block py-2 pr-4 pl-3 text-gray-400 border-b border-gray-600 hover:bg-gray-800 lg:hover:bg-transparent lg:border-0 lg:hover:text-blue-400 lg:p-0">
