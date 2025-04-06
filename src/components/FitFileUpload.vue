@@ -31,7 +31,7 @@
 
 <script>
 import axios from 'axios';
-
+import { API_URL } from "@/const";
 export default {
     data() {
         return {
@@ -76,7 +76,7 @@ export default {
                     return;
                 }
 
-                const response = await axios.post('http://127.0.0.1:8000/upload/', formData, {
+                const response = await axios.post(`${API_URL}/upload/`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                         'Authorization': `Token ${token}`,
