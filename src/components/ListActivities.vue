@@ -14,7 +14,7 @@
                     <div class="flex items-center justify-between mb-2 bg-black text-white px-4 py-2 rounded-md">
                         <p class="text-lg">
                             <strong>{{ activity.state }}, {{ formatDate(activity.time_started)
-                                }}</strong>
+                            }}</strong>
                         </p>
                     </div>
 
@@ -103,7 +103,7 @@
 
 <script>
 import axiosInstance from "@/services/axiosInstance";
-
+import { API_URL } from "@/const";
 export default {
     name: "ActivitiesList",
     data() {
@@ -135,7 +135,7 @@ export default {
         async fetchActivities(page = 1) {
             try {
                 const response = await axiosInstance.get(
-                    `http://localhost:8000/api/activities/?page=${page}&limit=${this.itemsPerPage}`
+                    `${API_URL}/api/activities/?page=${page}&limit=${this.itemsPerPage}`
                 );
 
                 this.activities = response.data.results;
@@ -143,7 +143,6 @@ export default {
                 this.activities.sort((a, b) => {
                     const timeA = new Date(a.time_started);
                     const timeB = new Date(b.time_started);
-
 
                     return timeB - timeA;
                 });
@@ -202,7 +201,7 @@ export default {
             if (!this.activityToDelete) return;
 
             try {
-                await axiosInstance.delete(`http://localhost:8000/api/activities/${this.activityToDelete}/`);
+                await axiosInstance.delete(`${API_URL}/api/activities/${this.activityToDelete}/`);
                 this.activities = this.activities.filter(activity => activity.ActivityID !== this.activityToDelete);
             } catch (error) {
                 console.error("Error deleting activity:", error);

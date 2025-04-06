@@ -81,7 +81,7 @@
 
 <script>
 import axiosInstance from "@/services/axiosInstance";
-
+import { API_URL } from "@/const";
 export default {
     data() {
         return {
@@ -94,7 +94,7 @@ export default {
     methods: {
         async fetchStats() {
             try {
-                const response = await axiosInstance.get("http://localhost:8000/api/stats/");
+                const response = await axiosInstance.get(`${API_URL}/api/stats/`);
                 const newStats = response.data;
                 if (JSON.stringify(newStats) !== JSON.stringify(this.stats)) {
                     this.stats = newStats;

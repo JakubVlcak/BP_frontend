@@ -15,7 +15,7 @@ import { createEventsServicePlugin } from '@schedule-x/events-service'
 import '@schedule-x/theme-default/dist/calendar.css'
 import TheHeader from '@/components/TheHeader.vue'
 import axiosInstance from '@/services/axiosInstance'
-
+import { API_URL } from "@/const";
 const router = useRouter();
 const eventsServicePlugin = createEventsServicePlugin();
 
@@ -56,7 +56,7 @@ function formatElapsedTime(timeString) {
 async function fetchAllActivities(page = 1, allActivities = []) {
     try {
         const response = await axiosInstance.get(
-            `http://localhost:8000/api/activities/?page=${page}&limit=50`
+            `${API_URL}/api/activities/?page=${page}&limit=50`
         );
 
         const activities = response.data.results;
